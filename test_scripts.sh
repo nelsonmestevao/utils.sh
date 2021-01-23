@@ -9,7 +9,6 @@ SCRIPTS_DIR=$(dirname "${BASH_SOURCE[0]:-$0}")/scripts
 . ${SCRIPTS_DIR}/logging.sh
 . ${SCRIPTS_DIR}/utils.sh
 
-
 echo "$RED$(italic Nelson)"
 format -c magenta
 strikethrough "Nelson"

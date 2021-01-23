@@ -9,12 +9,8 @@ import() {
   . "${SCRIPTS_DIR}/${1}"
 }
 
-# shellcheck source=./colors.sh
-import colors.sh
-# shellcheck source=./utils.sh
-import utils.sh
-
-[ "$0" = "$BASH_SOURCE" ] && get_version
+# shellcheck source=./helpers.sh
+import helpers.sh
 
 __set_trap() {
   trap -p "$1" | grep "$2" &>/dev/null ||
@@ -136,3 +132,5 @@ function execute() {
 
   return $exitCode
 }
+
+[ "$0" = "$BASH_SOURCE" ] && display_version 0.4.0 || true

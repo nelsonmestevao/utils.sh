@@ -9,6 +9,9 @@ import() {
   . "${SCRIPTS_DIR}/${1}"
 }
 
+# shellcheck source=./helpers.sh
+import helpers.sh
+
 function not_installed() {
   [ ! -x "$(command -v "$@")" ]
 }
@@ -27,3 +30,5 @@ function ask_for_sudo() {
     kill -0 "$$" || exit
   done &>/dev/null &
 }
+
+[ "$0" = "$BASH_SOURCE" ] && display_version 0.4.0 || true

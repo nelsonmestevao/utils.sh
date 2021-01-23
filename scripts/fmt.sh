@@ -9,6 +9,9 @@ import() {
   . "${SCRIPTS_DIR}/${1}"
 }
 
+# shellcheck source=./helpers.sh
+import helpers.sh
+
 __ansi() {
   echo -e "\e[${1}m${*:2}\e[0m"
 }
@@ -119,3 +122,5 @@ function format() {
     echo -en '\033[0;0m'
   fi
 }
+
+[ "$0" = "$BASH_SOURCE" ] && display_version 0.4.0 || true

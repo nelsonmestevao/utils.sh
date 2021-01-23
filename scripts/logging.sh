@@ -9,22 +9,8 @@ import() {
   . "${SCRIPTS_DIR}/${1}"
 }
 
-# shellcheck source=./colors.sh
-. "${SCRIPTS_DIR}/colors.sh"
-
-VERSION=0.3.2
-get_version() {
-  local -r version=0.4.0
-
-  declare -A info=(
-    ["full"]=$version
-    ["major"]=$(echo $version | cut -d. -f1)
-    ["minor"]=$(echo $version | cut -d. -f2)
-    ["revision"]=$(echo $version | cut -d. -f3)
-  )
-
-  echo "${info[$1:-full]}"
-}
+# shellcheck source=./helpers.sh
+import helpers.sh
 
 function __log() {
   local LABEL="$1"
@@ -61,3 +47,5 @@ function log_info() {
 
   __log "${LABEL}" "$CYAN" "$@"
 }
+
+[ "$0" = "$BASH_SOURCE" ] && display_version 0.4.0 || true
