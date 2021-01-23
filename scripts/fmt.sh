@@ -2,9 +2,12 @@
 
 set -Eeuo pipefail
 
-SCRIPTS_DIR=$(dirname "${BASH_SOURCE[0]:-$0}")
+import() {
+  local -r SCRIPTS_DIR=$(dirname "${BASH_SOURCE[0]:-$0}")
 
-VERSION=0.3.2
+  # shellcheck source=/dev/null
+  . "${SCRIPTS_DIR}/${1}"
+}
 
 __ansi() {
   echo -e "\e[${1}m${*:2}\e[0m"

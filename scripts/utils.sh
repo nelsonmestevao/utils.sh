@@ -2,12 +2,12 @@
 
 set -Eeuo pipefail
 
-SCRIPTS_DIR=$(dirname "${BASH_SOURCE[0]:-$0}")
+import() {
+  local -r SCRIPTS_DIR=$(dirname "${BASH_SOURCE[0]:-$0}")
 
-# shellcheck source=./colors.sh
-. "${SCRIPTS_DIR}/colors.sh"
-
-VERSION=0.3.2
+  # shellcheck source=/dev/null
+  . "${SCRIPTS_DIR}/${1}"
+}
 
 function not_installed() {
   [ ! -x "$(command -v "$@")" ]

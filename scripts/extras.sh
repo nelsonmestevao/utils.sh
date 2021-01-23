@@ -2,12 +2,19 @@
 
 set -Eeuo pipefail
 
-SCRIPTS_DIR=$(dirname "${BASH_SOURCE[0]:-$0}")
+import() {
+  local -r SCRIPTS_DIR=$(dirname "${BASH_SOURCE[0]:-$0}")
+
+  # shellcheck source=/dev/null
+  . "${SCRIPTS_DIR}/${1}"
+}
 
 # shellcheck source=./colors.sh
-. "${SCRIPTS_DIR}/colors.sh"
+import colors.sh
+# shellcheck source=./utils.sh
+import utils.sh
 
-VERSION=0.3.2
+[ "$0" = "$BASH_SOURCE" ] && get_version
 
 __set_trap() {
   trap -p "$1" | grep "$2" &>/dev/null ||

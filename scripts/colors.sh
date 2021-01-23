@@ -1,6 +1,16 @@
 #!/usr/bin/env bash
 
-VERSION=0.3.2
+set -Eeuo pipefail
+
+import() {
+  local -r SCRIPTS_DIR=$(dirname "${BASH_SOURCE[0]:-$0}")
+
+  # shellcheck source=/dev/null
+  . "${SCRIPTS_DIR}/${1}"
+}
+
+# shellcheck source=./utils.sh
+import utils.sh
 
 RED=$(tput setaf 1)
 ORANGE=$(tput setaf 3)
