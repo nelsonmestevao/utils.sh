@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION=0.3.1
+VERSION=0.3.2
 
 RED=$(tput setaf 1)
 ORANGE=$(tput setaf 3)

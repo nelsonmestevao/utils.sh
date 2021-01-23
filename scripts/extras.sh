@@ -7,7 +7,7 @@ SCRIPTS_DIR=$(dirname "${BASH_SOURCE[0]:-$0}")
 # shellcheck source=./colors.sh
 . "${SCRIPTS_DIR}/colors.sh"
 
-VERSION=0.3.1
+VERSION=0.3.2
 
 __set_trap() {
   trap -p "$1" | grep "$2" &>/dev/null ||

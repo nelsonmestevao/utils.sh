@@ -7,7 +7,7 @@ SCRIPTS_DIR=$(dirname "${BASH_SOURCE[0]:-$0}")
 # shellcheck source=./colors.sh
 . "${SCRIPTS_DIR}/colors.sh"
 
-VERSION=0.3.1
+VERSION=0.3.2
 
 function __log() {
   local LABEL="$1"
@@ -15,11 +15,11 @@ function __log() {
   shift 2
   local MSG=("$@")
   # Get symbols from https://coolsymbol.com/
-  printf "_${COLOR}${BOLD}${LABEL}${RESET}_╞%*s\n" $(($(tput cols) - ${#LABEL} - 3)) | sed -e 's/ /═/g' | sed -e 's/_/ /g'
+  printf "_${COLOR}${BOLD}${LABEL}${RESET}_╞%*s\n" $(($(tput cols) - ${#LABEL} - 3)) " " | sed -e 's/ /═/g' | sed -e 's/_/ /g'
   for M in "${MSG[@]}"; do
     echo "• $M"
   done
-  printf "%*s\n" $(tput cols) | sed -e 's/ /═/g'
+  printf "%*s\n" "$(tput cols)" " " | sed -e 's/ /═/g'
 }
 
 function log_error() {
@@ -38,7 +38,7 @@ function log_info() {
   local LABEL="INFO"
 
   if ! [ "$#" -eq 1 ]; then
-    LABEL=$(echo "$1" | tr '[a-z]' '[A-Z]')
+    LABEL=$(echo "$1" | tr '[:lower:]' '[:upper:]')
     shift 1
   fi
 

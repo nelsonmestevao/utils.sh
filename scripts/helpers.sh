@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 
-# set -Eeuo pipefail
+set -Eeuo pipefail
 
 SCRIPTS_DIR=$(dirname "${BASH_SOURCE[0]:-$0}")
 
 # shellcheck source=./colors.sh
 . "${SCRIPTS_DIR}/colors.sh"
 
-VERSION=0.3.1
+VERSION=0.3.2
 
 function help_title_section() {
-  local TITLE=$(echo "$@" | tr '[a-z]' '[A-Z]')
+  local -r TITLE=$(echo "$@" | tr '[:lower:]' '[:upper:]')
   echo -e "${BOLD}${TITLE}${RESET}"
 }
 
