@@ -19,18 +19,18 @@ increment_version() {
 
   case ${2:-patch} in
     major)
-      major=$(($major + 1))
+      ((major++))
       minor=0
       patch=0
       ;;
 
     minor)
-      minor=$(($minor + 1))
+      ((minor++))
       patch=0
       ;;
 
     patch)
-      patch=$(($patch + 1))
+      ((patch++))
       ;;
   esac
 
@@ -41,11 +41,11 @@ update_version() {
   local file="$1"
   local new_version="$2"
 
-  sed -i "/display_version / s/\([0-9]\)\.\([0-9]\)\.\([0-9]\)/$new_version/g" $file
+  sed -i "/display_version / s/\([0-9]\)\.\([0-9]\)\.\([0-9]\)/$new_version/g" "$file"
 }
 
 current_version=$(get_version "${1:?'File is mandatory'}")
 
 new_version=$(increment_version "$current_version" "${2:-patch}")
 
-update_version $1 $new_version
+update_version "$1" "$new_version"
