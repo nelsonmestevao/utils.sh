@@ -31,4 +31,4 @@ function ask_for_sudo() {
   done &>/dev/null &
 }
 
-[ "$0" = "${BASH_SOURCE[0]}" ] && display_version 0.4.1 || true
+[ "$0" = "${BASH_SOURCE[0]}" ] && display_version 0.4.2 || true
