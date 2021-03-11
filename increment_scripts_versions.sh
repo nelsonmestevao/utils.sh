@@ -38,14 +38,28 @@ increment_version() {
 }
 
 update_version() {
-  local file="$1"
-  local new_version="$2"
+  local new_version="$1"
+  local file="$2"
 
   sed -i "/display_version / s/\([0-9]\)\.\([0-9]\)\.\([0-9]\)/$new_version/g" "$file"
 }
 
-current_version=$(get_version "${1:?'File is mandatory'}")
+case ${1:-patch} in
+  patch)
+    semver="patch"
+    ;;
+  minor)
+    semver="patch"
+    ;;
+  major)
+    semver="patch"
+    ;;
+esac
 
-new_version=$(increment_version "$current_version" "${2:-patch}")
+shift 1
 
-update_version "$1" "$new_version"
+for file in "$@"; do
+  new_version=$(increment_version "$current_version" "$semver")
+  current_version=$(get_version "$file")
+  update_version "$new_version" "$file"
+done
