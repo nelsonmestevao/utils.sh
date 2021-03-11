@@ -49,10 +49,10 @@ case ${1:-patch} in
     semver="patch"
     ;;
   minor)
-    semver="patch"
+    semver="minor"
     ;;
   major)
-    semver="patch"
+    semver="major"
     ;;
 esac
 
