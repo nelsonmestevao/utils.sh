@@ -40,4 +40,4 @@ function ensure_confirmation() {
   fi
 }
 
-[ "$0" = "${BASH_SOURCE[0]}" ] && display_version 0.5.1 || true
+[ "$0" = "${BASH_SOURCE[0]}" ] && display_version 0.5.2 || true
