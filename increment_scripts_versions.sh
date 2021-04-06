@@ -59,7 +59,7 @@ esac
 shift 1
 
 for file in "$@"; do
-  new_version=$(increment_version "$current_version" "$semver")
   current_version=$(get_version "$file")
+  new_version=$(increment_version "$current_version" "$semver")
   update_version "$new_version" "$file"
 done
