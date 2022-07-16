@@ -2,7 +2,7 @@
 
 set -Eeuo pipefail
 
-SCRIPTS_DIR=$(dirname "${BASH_SOURCE[0]:-$0}")/scripts
+SCRIPTS_DIR="$(dirname "${BASH_SOURCE[0]:-$0}")/scripts"
 
 . ${SCRIPTS_DIR}/colors.sh
 . ${SCRIPTS_DIR}/fmt.sh
