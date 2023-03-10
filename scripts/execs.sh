@@ -133,4 +133,4 @@ function execute() {
   return $exitCode
 }
 
-[ "$0" = "${BASH_SOURCE[0]}" ] && display_version 0.7.0 || true
+([ "$0" = "${BASH_SOURCE[0]}" ] && display_version 0.8.0) || true
