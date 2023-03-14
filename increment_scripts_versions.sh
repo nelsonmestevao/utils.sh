@@ -58,7 +58,7 @@ esac
 
 shift 1
 
-for file in "$(ls scripts/*.sh)"; do
+for file in $(ls scripts/*.sh); do
   current_version=$(get_version "$file")
   new_version=$(increment_version "$current_version" "$semver")
   update_version "$new_version" "$file"

@@ -57,4 +57,8 @@ function get_os_name() {
   uname | tr '[:upper:]' '[:lower:]'
 }
 
-([ "$0" = "${BASH_SOURCE[0]}" ] && display_version 0.8.0) || true
+function timestamp() {
+  date --utc +%FT%TZ
+}
+
+([ "$0" = "${BASH_SOURCE[0]}" ] && display_version 0.8.1) || true
