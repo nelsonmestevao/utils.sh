@@ -25,4 +25,4 @@ function get_default_repo_branch() {
   echo master
 }
 
-([ "$0" = "${BASH_SOURCE[0]}" ] && display_version 0.8.1) || true
+([ "$0" = "${BASH_SOURCE[0]}" ] && display_version 0.9.0) || true
