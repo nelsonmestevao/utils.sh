@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+ARCH_PACKAGES=(
+  bash-bats
+  bash-bats-assert
+  bash-bats-support
+  shfmt
+  make
+)
+
+FEDORA_PACKAGES=(
+  bats
+  shfmt
+  make
+)
+
+UBUNTU_DEBIAN_PACKAGES=(
+  bats
+  shfmt
+  make
+)
+
+if [[ -f /etc/arch-release ]]; then
+  for pkg in ${ARCH_PACKAGES[@]}; do
+    yay -Syu $pkg
+  done
+elif [[ -f /etc/fedora-release ]]; then
+  for pkg in ${FEDORA_PACKAGES[@]}; do
+    sudo dnf install -y $pkg
+  done
+elif [[ -f /etc/lsb-release ]] || [[ -f /etc/debian_version ]]; then
+  for pkg in ${UBUNTU_DEBIAN_PACKAGES[@]}; do
+    sudo apt-get install -y $pkg
+  done
+else
+  echo "Error: This script does not support your operating system."
+  exit 1
+fi

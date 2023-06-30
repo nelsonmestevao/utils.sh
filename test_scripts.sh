@@ -5,7 +5,7 @@ set -Eeuo pipefail
 SCRIPTS_DIR="$(dirname "${BASH_SOURCE[0]:-$0}")/scripts"
 
 . ${SCRIPTS_DIR}/colors.sh
-. ${SCRIPTS_DIR}/fmt.sh
+. ${SCRIPTS_DIR}/formatting.sh
 . ${SCRIPTS_DIR}/logging.sh
 . ${SCRIPTS_DIR}/utils.sh
 
@@ -21,3 +21,6 @@ log_error "Terrible things happen"
 log_warn "Alarming things happen"
 log_success "Everything is good"
 
+load_env_file ".env"
+load_env_file -dbg ".env"
+load_env_file "non-existing.env"
