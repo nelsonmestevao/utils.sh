@@ -18,7 +18,7 @@ fmt format:
 
 .PHONY: lint # Lint the source code
 lint:
-	@find scripts -name "*.sh" -exec shellcheck {} \;
+	@find scripts -name "*.sh" -exec shellcheck -xa {} \;
 
 .PHONY: test # Run the test suite
 test:
