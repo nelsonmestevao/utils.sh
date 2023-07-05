@@ -56,7 +56,7 @@ function log_info() {
   local LABEL="INFO"
   local MSGS=()
 
-  while (("$#")); do
+  while (($#)); do
     case "$1" in
       --label)
         LABEL=$(echo "$2" | tr '[:lower:]' '[:upper:]')
@@ -66,7 +66,7 @@ function log_info() {
         shift
         break
         ;;
-      -* | --*=) # unsupported flags
+      -*) # unsupported flags
         echo "${RED}Error${RED}: Unsupported flag $1" >&2
         exit 1
         ;;
