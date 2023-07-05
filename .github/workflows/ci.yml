@@ -20,4 +20,6 @@ jobs:
           sudo apt-get install -y bats
 
       - name: Run tests
-        run: make test
+        run: |
+          export TERM=xterm
+          script -qec 'make test'
