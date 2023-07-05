@@ -56,7 +56,6 @@ function log_info() {
   local LABEL="INFO"
   local MSGS=()
 
-
   while (("$#")); do
     case "$1" in
       --label)

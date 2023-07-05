@@ -12,7 +12,6 @@ increment_version() {
   local minor=$(echo "$current_version" | cut -d'.' -f 2)
   local patch=$(echo "$current_version" | cut -d'.' -f 3)
 
-
   if [ -z "${major}" ] || [ -z "${minor}" ] || [ -z "${patch}" ]; then
     echo "VERSION <$major>.<$minor>.<$patch> is bad set or set to the empty string"
     exit 1
