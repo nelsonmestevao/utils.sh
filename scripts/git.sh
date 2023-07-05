@@ -18,7 +18,7 @@ function get_default_repo_branch() {
   local ref
   for ref in refs/{heads,remotes/{origin,upstream}}/{main,trunk,mainline,default}; do
     if command git show-ref -q --verify "$ref"; then
-      echo "${ref:t}"
+      echo "${ref##*/}"
       return
     fi
   done
