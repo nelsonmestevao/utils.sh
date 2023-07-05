@@ -2,12 +2,12 @@
 
 set -Eeuo pipefail
 
-SCRIPTS_DIR="$(dirname "${BASH_SOURCE[0]:-$0}")/scripts"
+DIR="$(dirname "${BASH_SOURCE[0]:-$0}")/scripts"
 
-. ${SCRIPTS_DIR}/colors.sh
-. ${SCRIPTS_DIR}/formatting.sh
-. ${SCRIPTS_DIR}/logging.sh
-. ${SCRIPTS_DIR}/utils.sh
+. ${DIR}/colors.sh
+. ${DIR}/formatting.sh
+. ${DIR}/logging.sh
+. ${DIR}/utils.sh
 
 echo "$RED$(italic 'Italic red')"
 
@@ -20,6 +20,9 @@ bold "This should be bold"
 log_error "Terrible things happen"
 log_warn "Alarming things happen"
 log_success "Everything is good"
+
+log_info "Cenas maradas"
+log_info --label "example" "cenas coisas"
 
 load_env_file ".env"
 load_env_file -dbg ".env"

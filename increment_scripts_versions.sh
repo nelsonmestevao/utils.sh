@@ -2,7 +2,7 @@
 
 get_version() {
   local file="$1"
-  grep "display_version " "$file" | grep -o "[0-9]\.[0-9]\.[0-9]"
+  grep "display_version " "$file" | grep -oP '\d+\.\d+\.\d+'
 }
 
 increment_version() {
@@ -12,6 +12,7 @@ increment_version() {
   local minor=$(echo "$current_version" | cut -d'.' -f 2)
   local patch=$(echo "$current_version" | cut -d'.' -f 3)
 
+
   if [ -z "${major}" ] || [ -z "${minor}" ] || [ -z "${patch}" ]; then
     echo "VERSION <$major>.<$minor>.<$patch> is bad set or set to the empty string"
     exit 1
@@ -19,29 +20,30 @@ increment_version() {
 
   case ${2:-patch} in
     major)
-      ((major++))
+      major=$(echo "$major + 1" | bc)
       minor=0
       patch=0
       ;;
 
     minor)
-      ((minor++))
+      minor=$(echo "$minor + 1" | bc)
       patch=0
       ;;
 
     patch)
-      ((patch++))
+      patch=$(echo "$patch + 1" | bc)
       ;;
   esac
 
   echo "$major.$minor.$patch"
+
 }
 
 update_version() {
   local new_version="$1"
   local file="$2"
 
-  sed -i "/display_version / s/\([0-9]\)\.\([0-9]\)\.\([0-9]\)/$new_version/g" "$file"
+  sed -Ei "/display_version / s/[0-9]+\.[0-9]+\.[0-9]+/$new_version/g" "$file"
 }
 
 case ${1:-patch} in

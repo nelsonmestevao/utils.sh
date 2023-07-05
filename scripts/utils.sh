@@ -3,7 +3,7 @@
 set -Eeuo pipefail
 
 import() {
-  local -r SCRIPTS_DIR=$(dirname "${BASH_SOURCE[0]:-$0}")
+  local -r SCRIPTS_DIR=$(dirname "${BASH_SOURCE[0]}")
 
   # shellcheck source=/dev/null
   . "${SCRIPTS_DIR}/${1}"
@@ -33,7 +33,7 @@ function load_env_file() {
   done
 
   if [ -f "$file" ]; then
-    log_info "Environment" "Loading ${BLUE}${file}${RESET}..."
+    log_info --label "Environment" "Loading ${BLUE}${file}${RESET}..."
     set -o allexport
     # shellcheck source=/dev/null
     source "$file"
@@ -79,4 +79,4 @@ function timestamp() {
   date --utc +%FT%TZ
 }
 
-([ "$0" = "${BASH_SOURCE[0]}" ] && display_version 0.10.0) || true
+([ "$0" = "${BASH_SOURCE[0]}" ] && display_version 0.11.0) || true

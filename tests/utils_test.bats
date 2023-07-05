@@ -16,9 +16,11 @@ teardown() {
 }
 
 @test "load_env_file with filename" {
+  . scripts/logging.sh
   . scripts/utils.sh
 
   run load_env_file test.env
+  echo $output
   [ "$status" -eq 0 ]
 
   # Verify that variables are exported
@@ -28,14 +30,12 @@ teardown() {
   [ "${var3}" = "expected_value3" ]
   [ "${var4}" = "Hello World" ]
 
-  # Split the output string into an array
-  mapfile -t output_lines <<<"$output"
-
   # Check the second line of output with a regex
-  [[ "${output_lines[1]}" =~ Loading\ .*test.env.*\.\.\. ]]
+  [[ "${lines[1]}" =~ Loading\ .*test.env.*\.\.\. ]]
 }
 
 @test "load_env_file with debug flag" {
+  . scripts/logging.sh
   . scripts/utils.sh
 
   run load_env_file --debug test.env
@@ -48,25 +48,20 @@ teardown() {
   [ "${var3}" = "expected_value3" ]
   [ "${var4}" = "Hello World" ]
 
-  # Split the output string into an array
-  mapfile -t output_lines <<<"$output"
-
   # Check the debug output is shown
-  [[ "${output_lines[4]}" =~ "var1=expected_value1" ]]
-  [[ "${output_lines[5]}" =~ "var2=expected_value2" ]]
-  [[ "${output_lines[6]}" =~ "var3=expected_value3" ]]
-  [[ "${output_lines[7]}" =~ "var4=\"Hello World\"" ]]
+  [[ "${lines[4]}" =~ "var1=expected_value1" ]]
+  [[ "${lines[5]}" =~ "var2=expected_value2" ]]
+  [[ "${lines[6]}" =~ "var3=expected_value3" ]]
+  [[ "${lines[7]}" =~ "var4=\"Hello World\"" ]]
 }
 
 @test "load_env_file with non existing env file" {
+  . scripts/logging.sh
   . scripts/utils.sh
 
   run load_env_file --debug non_existing.env
   [ "$status" -eq 0 ]
 
-  # Split the output string into an array
-  mapfile -t output_lines <<<"$output"
-
   # Check the debug output is shown
-  [[ "${output_lines[1]}" =~ non_existing.env\ file\ not\ found,\ skipping\.\.\. ]]
+  [[ "${lines[1]}" =~ non_existing.env\ file\ not\ found,\ skipping\.\.\. ]]
 }
