@@ -9,16 +9,15 @@ on:
 jobs:
   test:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: Set up BATS
-      run: |
-        git clone https://github.com/bats-core/bats-core.git
-        cd bats-core
-        sudo ./install.sh /usr/local
+      - name: Set up Bats
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bats
 
-    - name: Run tests
-      run: make test
+      - name: Run tests
+        run: make test
