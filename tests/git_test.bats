@@ -8,4 +8,3 @@
   [ "$status" -eq 0 ]
   [ "$output" = "main" ]
 }
-
