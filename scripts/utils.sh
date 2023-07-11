@@ -75,8 +75,17 @@ function get_os_name() {
   uname | tr '[:upper:]' '[:lower:]'
 }
 
+function sanitize_name() {
+  local name=$1
+
+  # Replace periods and other non-alphanumeric characters with hyphens
+  local sanitized_name=$(echo "$name" | sed 's/[^a-zA-Z0-9]/-/g')
+
+  echo "$sanitized_name"
+}
+
 function timestamp() {
   date --utc +%FT%TZ
 }
 
-([ "$0" = "${BASH_SOURCE[0]}" ] && display_version 0.11.0) || true
+([ "$0" = "${BASH_SOURCE[0]}" ] && display_version 0.12.0) || true
