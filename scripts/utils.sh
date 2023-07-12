@@ -79,9 +79,7 @@ function sanitize_name() {
   local name=$1
 
   # Replace periods and other non-alphanumeric characters with hyphens
-  local sanitized_name=$(echo "$name" | sed 's/[^a-zA-Z0-9]/-/g')
-
-  echo "$sanitized_name"
+  echo "${name//[^a-zA-Z0-9]/-}"
 }
 
 function timestamp() {
