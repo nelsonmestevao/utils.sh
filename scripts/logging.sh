@@ -84,4 +84,4 @@ function log_debug() {
   __log "DEBUG" "DEBUG" "$PURPLE" "$@"
 }
 
-([ "$0" = "${BASH_SOURCE[0]}" ] && display_version 0.12.1) || true
+([ "$0" = "${BASH_SOURCE[0]}" ] && display_version 0.13.0) || true
