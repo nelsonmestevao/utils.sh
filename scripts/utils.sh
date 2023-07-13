@@ -63,10 +63,18 @@ function ask_for_sudo() {
 }
 
 function ensure_confirmation() {
-  read -r "confirmation?please confirm you want to continue [y/n] (default: y) "
+  local confirmation
+
+  # Using echo to output the message and -n flag to allow following input in the same line
+  echo -n "Are you sure you want to proceed? [Y/n] "
+  read -r confirmation
+
+  # Transform to lowercase to allow 'Y' or 'y' as a confirmation
+  confirmation=${confirmation,,}
   confirmation=${confirmation:-"y"}
 
   if [ "$confirmation" != "y" ]; then
+    echo "Confirmation failed. Exiting."
     exit 1
   fi
 }
