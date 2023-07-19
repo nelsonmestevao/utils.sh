@@ -67,7 +67,7 @@ function log_info() {
         break
         ;;
       -*) # unsupported flags
-        echo "${RED}Error${RED}: Unsupported flag $1" >&2
+        echo -e "\n ${RED}>>>${RESET} ${BOLD}${YELLOW}Unsupported flag '$1'${RESET} ${RED}⨯${RESET}\n" >&2
         exit 1
         ;;
       *) # preserve positional arguments

@@ -74,7 +74,7 @@ function ensure_confirmation() {
   confirmation=${confirmation:-"y"}
 
   if [ "$confirmation" != "y" ]; then
-    echo -e "\n${RED}>>>${RESET} ${BOLD}${YELLOW}Operation cancelled. Exiting...${RESET} ${RED}⨯${RESET}\n"
+    echo -e "\n ${RED}>>>${RESET} ${BOLD}${YELLOW}Operation cancelled. Exiting...${RESET} ${RED}⨯${RESET}\n"
     exit 1
   fi
 }
