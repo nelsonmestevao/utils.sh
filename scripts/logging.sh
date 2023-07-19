@@ -20,6 +20,10 @@ LOG_LEVELS=([DEBUG]=0 [INFO]=1 [WARN]=3 [ERROR]=4)
 # Set default log level
 LOG_LEVEL=${LOG_LEVEL:-"DEBUG"}
 
+function exit_message() {
+  echo -e "\n ${RED}>>>${RESET} ${BOLD}${YELLOW}$1${RESET} ${RED}⨯${RESET}\n"
+}
+
 function __log() {
   local LEVEL="$1"
   local LABEL="$2"
@@ -67,7 +71,7 @@ function log_info() {
         break
         ;;
       -*) # unsupported flags
-        echo -e "\n ${RED}>>>${RESET} ${BOLD}${YELLOW}Unsupported flag '$1'${RESET} ${RED}⨯${RESET}\n" >&2
+        exit_message "Unsupported flag '$1' in 'log_info()' function"
         exit 1
         ;;
       *) # preserve positional arguments
