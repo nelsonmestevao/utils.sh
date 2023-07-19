@@ -16,6 +16,7 @@ teardown() {
 }
 
 @test "load_env_file with filename" {
+  . scripts/colors.sh
   . scripts/logging.sh
   . scripts/utils.sh
 
@@ -35,6 +36,7 @@ teardown() {
 }
 
 @test "load_env_file with debug flag" {
+  . scripts/colors.sh
   . scripts/logging.sh
   . scripts/utils.sh
 
@@ -56,6 +58,7 @@ teardown() {
 }
 
 @test "load_env_file with non existing env file" {
+  . scripts/colors.sh
   . scripts/logging.sh
   . scripts/utils.sh
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env bats
 
+load ../../scripts/colors.sh
 load ../../scripts/utils.sh
 
 @test "ensure_confirmation with Y input" {

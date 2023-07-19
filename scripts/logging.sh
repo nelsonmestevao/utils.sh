@@ -45,7 +45,7 @@ function log_error() {
 }
 
 function log_warn() {
-  __log "WARN" "WARN" "$ORANGE" "$@"
+  __log "WARN" "WARN" "$YELLOW" "$@"
 }
 
 function log_success() {

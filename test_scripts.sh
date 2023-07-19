@@ -27,3 +27,5 @@ log_info --label "example" "cenas coisas"
 load_env_file ".env"
 load_env_file -dbg ".env"
 load_env_file "non-existing.env"
+
+ensure_confirmation
