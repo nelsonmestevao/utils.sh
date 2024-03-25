@@ -95,7 +95,7 @@ function datetime() {
 }
 
 function timestamp() {
-  date --utc +%FT%TZ
+  date --utc '+%Y%m%d%H%M%S'
 }
 
 ([ "$0" = "${BASH_SOURCE[0]}" ] && display_version 0.14.0) || true
