@@ -90,6 +90,10 @@ function sanitize_name() {
   echo "${name//[^a-zA-Z0-9]/-}"
 }
 
+function datetime() {
+  date --utc '+%FT%TZ'
+}
+
 function timestamp() {
   date --utc +%FT%TZ
 }
