@@ -16,6 +16,10 @@ import logging.sh
 # shellcheck source=./helpers.sh
 import helpers.sh
 
+function is_installed() {
+  [ -x "$(command -v "$@")" ]
+}
+
 function not_installed() {
   [ ! -x "$(command -v "$@")" ]
 }
@@ -33,7 +37,7 @@ function load_env_file() {
   done
 
   if [ -f "$file" ]; then
-    log_info --label "Environment" "Loading ${BLUE}${file}${RESET}..."
+    log_info --label "Environment" "Loading ${CYAN}${file}${RESET}..."
     set -o allexport
     # shellcheck source=/dev/null
     source "$file"
