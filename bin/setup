@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -Eeuo pipefail
+
 ARCH_PACKAGES=(
   bash-bats
   bash-bats-assert
@@ -28,10 +30,12 @@ elif [[ -f /etc/fedora-release ]]; then
   for pkg in ${FEDORA_PACKAGES[@]}; do
     sudo dnf install -y $pkg
   done
-elif [[ -f /etc/lsb-release ]] || [[ -f /etc/debian_version ]]; then
+elif [[ -f /etc/lsb-release ]] && grep -q "DISTRIB_ID=Ubuntu" /etc/lsb-release || [[ -f /etc/debian_version ]]; then
   for pkg in ${UBUNTU_DEBIAN_PACKAGES[@]}; do
     sudo apt-get install -y $pkg
   done
+elif [[ -f /etc/os-release ]] && grep -q "NAME=NixOS" /etc/os-release; then
+  nix develop --command $SHELL
 else
   echo "Error: This script does not support your operating system."
   exit 1
