@@ -6,6 +6,8 @@ WARN_COLOR=\x1b[33m
 OK_STRING=$(OK_COLOR)✓$(NO_COLOR)
 ERROR_STRING=$(ERROR_COLOR)⨯$(NO_COLOR)
 WARN_STRING=$(WARN_COLOR)!$(NO_COLOR)
+#------------------------------------------------------------------------------
+TESTS_DIR := tests tests/utils
 #==============================================================================
 
 .PHONY: setup # Install package dependencies for development
@@ -22,7 +24,7 @@ lint:
 
 .PHONY: test # Run the test suite
 test:
-	@find tests -name "*_test.bats" -exec bats {} \;
+	@bats $(TESTS_DIR)
 
 .PHONY: help # Generate list of targets with descriptions
 help:
