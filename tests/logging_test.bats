@@ -60,3 +60,33 @@
   [ "${#output}" -gt 0 ]
   [ "${lines[1]}" = "• This is a test debug message" ]
 }
+
+@test "log_info treats arguments after -- as messages" {
+  . scripts/logging.sh
+
+  run log_info -- "--not-a-flag"
+
+  [ "$status" -eq 0 ]
+  [ "${lines[1]}" = "• --not-a-flag" ]
+}
+
+@test "log_info with an unsupported flag fails" {
+  . scripts/logging.sh
+
+  run log_info --bogus "message"
+
+  [ "$status" -eq 1 ]
+  [[ "$output" =~ "Unsupported flag '--bogus'" ]]
+}
+
+@test "log functions below LOG_LEVEL produce no output" {
+  . scripts/logging.sh
+  LOG_LEVEL=ERROR
+
+  run log_info "hidden"
+  [ "$status" -eq 0 ]
+  [ -z "$output" ]
+
+  run log_error "shown"
+  [ "${lines[1]}" = "• shown" ]
+}

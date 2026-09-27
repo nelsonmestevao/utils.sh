@@ -13,8 +13,10 @@ import() {
 import helpers.sh
 
 __set_trap() {
-  trap -p "$1" | grep "$2" &>/dev/null ||
-    trap '$2' "$1"
+  if ! trap -p "$1" | grep "$2" &>/dev/null; then
+    # shellcheck disable=SC2064 # expand the command name now, on purpose
+    trap "$2" "$1"
+  fi
 }
 
 __kill_all_subprocesses() {
@@ -116,11 +118,10 @@ function execute() {
 
   # Wait for the commands to no longer be executing
   # in the background, and then get their exit code.
-  wait "$cmdsPID" &>/dev/null
-  exitCode=$?
+  wait "$cmdsPID" &>/dev/null || exitCode=$?
 
   # Print output based on what happened.
-  __print_result $exitCode "$MSG"
+  __print_result $exitCode "$MSG" || true
 
   if [ $exitCode -ne 0 ]; then
     __print_error_stream <"$TMP_FILE"

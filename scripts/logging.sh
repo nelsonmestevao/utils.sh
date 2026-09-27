@@ -68,6 +68,7 @@ function log_info() {
         ;;
       --) # end argument parsing
         shift
+        MSGS+=("$@")
         break
         ;;
       -*) # unsupported flags
