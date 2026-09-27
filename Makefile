@@ -26,6 +26,11 @@ lint:
 test:
 	@bats $(TESTS_DIR)
 
+.PHONY: coverage # Run the test suite with coverage report
+coverage:
+	@kcov --clean --bash-parser="$$(command -v bash)" --include-path=scripts \
+		--bash-parse-files-in-dir=scripts coverage bats $(TESTS_DIR)
+
 .PHONY: help # Generate list of targets with descriptions
 help:
 	@grep '^.PHONY: .* #' Makefile | sed 's/\.PHONY: \(.*\) # \(.*\)/\t\1\t\2/'

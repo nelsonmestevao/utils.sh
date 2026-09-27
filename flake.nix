@@ -24,6 +24,7 @@
           buildInputs = with pkgs; [
             bats
             gnumake
+            kcov
             shfmt
             shellcheck
           ];
