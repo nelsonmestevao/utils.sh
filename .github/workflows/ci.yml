@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - name: Set up Bats and kcov
+      - name: Set up bats and kcov
         run: |
           sudo apt-get update
           sudo apt-get install -y bats kcov
@@ -33,10 +33,3 @@ jobs:
             "|---|---:|---:|",
             (.files[] | "| `\(.file | sub(".*/scripts/"; "scripts/"))` | \(.percent_covered)% | \(.covered_lines)/\(.total_lines) |")
           ' coverage/bats/coverage.json >>"$GITHUB_STEP_SUMMARY"
-
-      - name: Upload coverage report
-        if: always() && hashFiles('coverage/bats/coverage.json') != ''
-        uses: actions/upload-artifact@v7
-        with:
-          name: coverage
-          path: coverage/
