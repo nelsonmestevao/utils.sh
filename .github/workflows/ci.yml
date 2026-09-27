@@ -2,33 +2,34 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main, master]
   pull_request:
-    branches: [ main ]
+
+env:
+  TERM: xterm
 
 jobs:
   test:
-
+    name: Tests and Coverage
     runs-on: ubuntu-26.04
 
     steps:
-      - uses: actions/checkout@v7
+      - name: ☁️ Checkout repository
+        uses: actions/checkout@v7
 
-      - name: Set up bats and kcov
+      - name: 🧰 Setup bats and kcov
         run: |
           sudo apt-get update
-          sudo apt-get install -y bats kcov
+          sudo apt-get install -y --no-install-recommends bats kcov
 
-      - name: Run tests with coverage
-        run: |
-          export TERM=xterm
-          script -qec 'make coverage'
+      - name: 🔬 Run the tests with coverage
+        run: script -qec 'make coverage'
 
-      - name: Write coverage summary
-        if: always() && hashFiles('coverage/bats/coverage.json') != ''
+      - name: 📊 Write coverage summary
+        if: ${{ !cancelled() && hashFiles('coverage/bats/coverage.json') != '' }}
         run: |
           jq -r '
-            "### Coverage: \(.percent_covered)%\n",
+            "### 🐚 Coverage: \(.percent_covered)%\n",
             "| File | Covered | Lines |",
             "|---|---:|---:|",
             (.files[] | "| `\(.file | sub(".*/scripts/"; "scripts/"))` | \(.percent_covered)% | \(.covered_lines)/\(.total_lines) |")
