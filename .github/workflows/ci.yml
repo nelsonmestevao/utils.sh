@@ -17,10 +17,11 @@ jobs:
       - name: ☁️ Checkout repository
         uses: actions/checkout@v7
 
-      - name: 🧰 Setup bats and kcov
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends bats kcov
+      - name: 🧰 Install the development tools
+        run: make setup
+
+      - name: 🧹 Lint the scripts
+        run: make lint
 
       - name: 🔬 Run the tests with coverage
         run: script -qec 'make coverage'

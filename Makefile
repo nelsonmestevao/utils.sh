@@ -7,29 +7,29 @@ OK_STRING=$(OK_COLOR)✓$(NO_COLOR)
 ERROR_STRING=$(ERROR_COLOR)⨯$(NO_COLOR)
 WARN_STRING=$(WARN_COLOR)!$(NO_COLOR)
 #------------------------------------------------------------------------------
-TESTS_DIR := tests tests/utils
+BATS := bats -r tests
 #==============================================================================
 
 .PHONY: setup # Install package dependencies for development
 setup:
 	@bin/setup
 
-.PHONY: format # Run code formatters
+.PHONY: fmt format # Run code formatters
 fmt format:
 	@shfmt -w -i 2 -l -ci .
 
 .PHONY: lint # Lint the source code
 lint:
-	@find scripts -name "*.sh" -exec shellcheck -xa {} \;
+	@shellcheck -xa scripts/*.sh *.sh bin/setup .gitlab/scripts/*.sh
 
 .PHONY: test # Run the test suite
 test:
-	@bats $(TESTS_DIR)
+	@$(BATS)
 
 .PHONY: coverage # Run the test suite with coverage report
 coverage:
 	@kcov --clean --bash-parser="$$(command -v bash)" --include-path=scripts \
-		--bash-parse-files-in-dir=scripts coverage bats $(TESTS_DIR)
+		--bash-parse-files-in-dir=scripts coverage $(BATS)
 
 .PHONY: help # Generate list of targets with descriptions
 help:

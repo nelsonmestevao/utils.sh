@@ -1,17 +1,20 @@
 #!/usr/bin/env bash
+#
+# Shows what the scripts print, to check it by eye in a terminal.
 
 set -Eeuo pipefail
 
-DIR="$(dirname "${BASH_SOURCE[0]:-$0}")/scripts"
+DIR="$(dirname "${BASH_SOURCE[0]}")/scripts"
 
-. ${DIR}/colors.sh
-. ${DIR}/formatting.sh
-. ${DIR}/logging.sh
-. ${DIR}/utils.sh
+# shellcheck source=scripts/formatting.sh
+. "${DIR}/formatting.sh"
+# shellcheck source=scripts/utils.sh
+. "${DIR}/utils.sh"
 
 echo "$RED$(italic 'Italic red')"
 
-echo $(format -c cyan "This should be Cyan")
+format -c cyan "This should be Cyan"
+echo
 
 strikethrough "This should be strike through"
 underline "This should be underline"

@@ -1,5 +1,6 @@
 #!/usr/bin/env bats
 
+load test_helper
 load ../scripts/formatting.sh
 
 @test "bold wraps the text" {
@@ -85,4 +86,39 @@ load ../scripts/formatting.sh
   run format -c green "first" "second"
 
   [ "$output" = $'\e[0;32mfirst\nsecond\n\e[0;0m' ]
+}
+
+@test "format with reset color and type" {
+  run format -c reset -t reset "text"
+
+  [ "$output" = $'\e[0;0mtext\e[0;0m' ]
+}
+
+@test "format without text prints only the style" {
+  run format -c red -t bold
+
+  [ "$status" -eq 0 ]
+  [ "$output" = $'\e[1;31m' ]
+}
+
+@test "format prints text that looks like a flag or has backslashes as it is" {
+  run format "-n"
+  [ "$output" = $'\e[0;0m-n\e[0;0m' ]
+
+  run format 'C:\temp'
+  [ "$output" = $'\e[0;0mC:\\temp\e[0;0m' ]
+}
+
+@test "bold prints backslashes as they are" {
+  run bold 'C:\temp'
+
+  [ "$output" = $'\e[1mC:\\temp\e[0m' ]
+}
+
+@test "format with a flag but no value ends, and resets" {
+  # Without errexit, a failed `shift 2` used to loop forever
+  run_clean timeout 5 bash -c '. scripts/formatting.sh; set +e; format text -c'
+
+  [ "$status" -eq 0 ]
+  [ "$output" = $'\e[0;0mtext\e[0;0m' ]
 }

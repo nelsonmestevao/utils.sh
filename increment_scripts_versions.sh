@@ -1,66 +1,24 @@
 #!/usr/bin/env bash
+#
+# Bump the version that every script prints when it runs directly.
+# Usage: ./increment_scripts_versions.sh [major|minor|patch]
 
-get_version() {
-  local file="$1"
-  grep "display_version " "$file" | grep -oP '\d+\.\d+\.\d+'
-}
+set -Eeuo pipefail
 
-increment_version() {
-  local -r current_version=$1
+cd "$(dirname "${BASH_SOURCE[0]}")"
 
-  local major=$(echo "$current_version" | cut -d'.' -f 1)
-  local minor=$(echo "$current_version" | cut -d'.' -f 2)
-  local patch=$(echo "$current_version" | cut -d'.' -f 3)
+current=$(sed -n 's/^UTILS_VERSION=//p' scripts/helpers.sh)
+IFS=. read -r major minor patch <<<"$current"
 
-  if [ -z "${major}" ] || [ -z "${minor}" ] || [ -z "${patch}" ]; then
-    echo "VERSION <$major>.<$minor>.<$patch> is bad set or set to the empty string"
+case "${1:-patch}" in
+  major) new="$((major + 1)).0.0" ;;
+  minor) new="${major}.$((minor + 1)).0" ;;
+  patch) new="${major}.${minor}.$((patch + 1))" ;;
+  *)
+    echo "Usage: $0 [major|minor|patch]" >&2
     exit 1
-  fi
-
-  case ${2:-patch} in
-    major)
-      major=$(echo "$major + 1" | bc)
-      minor=0
-      patch=0
-      ;;
-
-    minor)
-      minor=$(echo "$minor + 1" | bc)
-      patch=0
-      ;;
-
-    patch)
-      patch=$(echo "$patch + 1" | bc)
-      ;;
-  esac
-
-  echo "$major.$minor.$patch"
-
-}
-
-update_version() {
-  local new_version="$1"
-  local file="$2"
-
-  sed -Ei "/display_version / s/[0-9]+\.[0-9]+\.[0-9]+/$new_version/g" "$file"
-}
-
-case ${1:-patch} in
-  patch)
-    semver="patch"
-    ;;
-  minor)
-    semver="minor"
-    ;;
-  major)
-    semver="major"
     ;;
 esac
 
-shift 1
-
-for file in $(ls scripts/*.sh); do
-  current_version=$(get_version "$file")
-  new_version=$(increment_version "$current_version" "$semver")
-  update_version "$new_version" "$file"
-done
+sed -i "s/^UTILS_VERSION=.*/UTILS_VERSION=${new}/" scripts/helpers.sh
+echo "${current} -> ${new}"

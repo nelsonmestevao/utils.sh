@@ -2,54 +2,53 @@
 
 set -Eeuo pipefail
 
-import() {
-  local -r SCRIPTS_DIR=$(dirname "${BASH_SOURCE[0]}")
-
-  # shellcheck source=/dev/null
-  . "${SCRIPTS_DIR}/${1}"
-}
-
-# shellcheck source=./colors.sh
-import colors.sh
 # shellcheck source=./helpers.sh
-import helpers.sh
+. "$(dirname "${BASH_SOURCE[0]}")/helpers.sh"
 
-declare -A LOG_LEVELS
-LOG_LEVELS=([DEBUG]=0 [INFO]=1 [WARN]=3 [ERROR]=4)
+# Global (-g), so it still exists when this file is sourced inside a function.
+declare -gA LOG_LEVELS=([DEBUG]=0 [INFO]=1 [WARNING]=3 [ERROR]=4)
 
 # Set default log level
 LOG_LEVEL=${LOG_LEVEL:-"DEBUG"}
 
 function exit_message() {
-  echo -e "\n ${RED}>>>${RESET} ${BOLD}${YELLOW}$1${RESET} ${RED}⨯${RESET}\n"
+  printf '\n %s %s %s\n\n' "${RED}>>>${RESET}" "${BOLD}${YELLOW}$1${RESET}" "${RED}⨯${RESET}" >&2
 }
 
 function __log() {
-  local LEVEL="$1"
-  local LABEL="$2"
-  local COLOR="$3"
+  local -r LEVEL="$1" LABEL="$2" COLOR="$3"
+  local -r MIN_LEVEL=${LOG_LEVEL:-DEBUG}
   shift 3
-  local MSG=("$@")
 
-  if [ "${LOG_LEVELS[$LEVEL]}" -ge "${LOG_LEVELS[$LOG_LEVEL]}" ]; then
-    local SIZE
-    [[ $(tput cols) -ge 80 ]] && SIZE=80 || SIZE=$(tput cols)
-
-    # Get symbols from https://coolsymbol.com/
-    printf "_${COLOR}${BOLD}${LABEL}${RESET}_╞%*s\n" $((SIZE - ${#LABEL} - 3)) " " | sed -e 's/ /═/g' | sed -e 's/_/ /g'
-    for M in "${MSG[@]}"; do
-      echo "• $M"
-    done
-    printf "%*s\n" "$SIZE" " " | sed -e 's/ /═/g'
+  # The level is case-insensitive, and an unknown one falls back to INFO.
+  if [ "${LOG_LEVELS[$LEVEL]}" -lt "${LOG_LEVELS[${MIN_LEVEL^^}]:-${LOG_LEVELS[INFO]}}" ]; then
+    return 0
   fi
+
+  local size pad_size pad line msg
+  size=$(__tput cols)
+  size=${size:-80}
+  size=$((size < 80 ? size : 80))
+  pad_size=$((size - ${#LABEL} - 3))
+
+  # Pad with spaces, then swap them for ═ (spaces in the label stay intact).
+  printf -v pad '%*s' "$((pad_size > 0 ? pad_size : 1))" ''
+  printf -v line '%*s' "$size" ''
+
+  # Get symbols from https://coolsymbol.com/
+  printf ' %s ╞%s\n' "${COLOR}${BOLD}${LABEL}${RESET}" "${pad// /═}"
+  for msg in "$@"; do
+    echo "• $msg"
+  done
+  echo "${line// /═}"
 }
 
 function log_error() {
-  __log "ERROR" "FAIL" "$RED" "$@"
+  __log "ERROR" "FAIL" "$RED" "$@" >&2
 }
 
 function log_warn() {
-  __log "WARN" "WARN" "$YELLOW" "$@"
+  __log "WARNING" "WARN" "$YELLOW" "$@" >&2
 }
 
 function log_success() {
@@ -63,7 +62,7 @@ function log_info() {
   while (($#)); do
     case "$1" in
       --label)
-        LABEL=$(echo "$2" | tr '[:lower:]' '[:upper:]')
+        LABEL=${2^^}
         shift 2
         ;;
       --) # end argument parsing
@@ -89,4 +88,4 @@ function log_debug() {
   __log "DEBUG" "DEBUG" "$MAGENTA" "$@"
 }
 
-([ "$0" = "${BASH_SOURCE[0]}" ] && display_version 0.16.0) || true
+if [ "$0" = "${BASH_SOURCE[0]}" ]; then display_version "$UTILS_VERSION"; fi

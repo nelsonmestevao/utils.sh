@@ -2,134 +2,122 @@
 
 set -Eeuo pipefail
 
-import() {
-  local -r SCRIPTS_DIR=$(dirname "${BASH_SOURCE[0]:-$0}")
-
-  # shellcheck source=/dev/null
-  . "${SCRIPTS_DIR}/${1}"
-}
-
 # shellcheck source=./helpers.sh
-import helpers.sh
+. "$(dirname "${BASH_SOURCE[0]}")/helpers.sh"
 
+# Add a command to a signal's trap, keeping the commands already there.
 __set_trap() {
-  if ! trap -p "$1" | grep "$2" &>/dev/null; then
-    # shellcheck disable=SC2064 # expand the command name now, on purpose
-    trap "$2" "$1"
+  local -r signal="$1" cmd="$2" newline=$'\n'
+  local current=""
+
+  # Skip this in a subshell: there `trap -p` shows the parent's commands,
+  # which must not run again when the subshell ends. The downside: a trap the
+  # subshell set itself is also replaced, as bash can't tell the two apart.
+  if [ "$BASHPID" = "$$" ]; then
+    # `trap -p` prints `trap -- 'commands' SIGNAL`, so the commands end up in $3.
+    eval "set -- $(trap -p "$signal")"
+    current="${3:-}"
+  fi
+
+  if [[ "$current" != *"$cmd"* ]]; then
+    # Join with a newline, not `;`, in case the commands end in a comment or `&`.
+    # shellcheck disable=SC2064 # expand the commands now, on purpose
+    trap "${current:+$current$newline}$cmd" "$signal"
   fi
 }
 
-__kill_all_subprocesses() {
-  local i=""
+# Runs on exit, in case the script ends in the middle of `execute`: ends the
+# jobs still running and removes the file with their output.
+__execute_cleanup() {
+  local pid
 
-  for i in $(jobs -p); do
-    kill "$i"
-    wait "$i" &>/dev/null
+  # Jobs may end on their own meanwhile, and their exit codes must not
+  # replace the script's own exit code.
+  for pid in $(jobs -p); do
+    kill "$pid" &>/dev/null || true
+    wait "$pid" &>/dev/null || true
   done
+
+  if [ -n "${__EXECUTE_OUTPUT:-}" ]; then
+    rm -f "$__EXECUTE_OUTPUT"
+  fi
 }
 
 __print_error_stream() {
-  while read -r line; do
-    echo -e "    ↳ ${RED}ERROR${RESET}: $line"
+  local line
+
+  # `|| [ -n "$line" ]` keeps a last line that has no trailing newline.
+  while IFS= read -r line || [ -n "$line" ]; do
+    printf '    ↳ %s: %s\n' "${RED}ERROR${RESET}" "$line"
   done
 }
 
 __print_result() {
   if [ "$1" -eq 0 ]; then
-    echo -e " • $2 ${GREEN}✓${RESET}"
+    printf ' • %s %s\n' "$2" "${GREEN}✓${RESET}"
   else
-    echo -e " • $2 ${RED}⨯${RESET}"
+    printf ' • %s %s\n' "$2" "${RED}⨯${RESET}"
   fi
-
-  return "$1"
 }
 
 # Ideas from https://github.com/alrra/dotfiles/blob/main/src/os/utils.sh
 __show_spinner() {
-  #local -r FRAMES='/-\|'
-  local -r FRAMES='⡿⣟⣯⣷⣾⣽⣻⢿'
-
-  # shellcheck disable=SC2034
-  local -r NUMBER_OR_FRAMES=${#FRAMES}
-
-  local -r CMDS="$2"
-  local -r MSG="$3"
-  local -r PID="$1"
-
+  local -r PID="$1" MSG="$2"
+  # An array, as slicing a string would cut these multibyte characters in the
+  # C locale (cron, Docker).
+  local -ra FRAMES=(⡿ ⣟ ⣯ ⣷ ⣾ ⣽ ⣻ ⢿)
+  local -r RESTORE_CURSOR=$(__tput rc)
   local i=0
-  local frameText=""
 
-  # Note: In order for the Travis CI site to display
-  # things correctly, it needs special treatment, hence,
-  # the "is Travis CI?" checks.
-  if [ "${CI:-false}" != "true" ]; then
-    # Provide more space so that the text hopefully
-    # doesn't reach the bottom line of the terminal window.
-    #
-    # This is a workaround for escape sequences not tracking
-    # the buffer position (accounting for scrolling).
-    #
-    # See also: https://unix.stackexchange.com/a/278888
-    printf "\n\n\n"
-    tput cuu 3
-    tput sc
-  fi
+  # Make room below, so the text doesn't reach the bottom line of the
+  # terminal: the saved cursor position doesn't follow the scrolling.
+  # See also: https://unix.stackexchange.com/a/278888
+  printf '\n\n\n'
+  __tput cuu 3
+  __tput sc
 
-  # Display spinner while the commands are being executed.
   while kill -0 "$PID" &>/dev/null; do
-    frameText=" • $MSG ${FRAMES:i++%NUMBER_OR_FRAMES:1}"
-
-    # Print frame text.
-    if [ "${CI:-false}" != "true" ]; then
-      printf "%s\n" "$frameText"
-    else
-      printf "%s" "$frameText"
-    fi
-
+    printf ' • %s %s\n' "$MSG" "${FRAMES[i++ % ${#FRAMES[@]}]}"
     sleep 0.2
-
-    # Clear frame text.
-    if [ "${CI:-false}" != "true" ]; then
-      tput rc
-    else
-      printf "\r"
-    fi
+    printf '%s' "$RESTORE_CURSOR"
   done
 }
 
 function execute() {
   local -r CMDS="$1"
   local -r MSG="${2:-$1}"
-  local -r TMP_FILE="$(mktemp /tmp/XXXXX)"
 
   local exitCode=0
   local cmdsPID=""
 
-  # If the current process is ended, also end all its subprocesses.
-  __set_trap "EXIT" "__kill_all_subprocesses"
+  # Global, so the cleanup on exit can find it.
+  __EXECUTE_OUTPUT="$(mktemp)"
+  __set_trap "EXIT" "__execute_cleanup"
 
   # Execute commands in background
-  eval "$CMDS" &>"$TMP_FILE" &
-
+  eval "$CMDS" &>"$__EXECUTE_OUTPUT" &
   cmdsPID=$!
 
-  # Show a spinner if the commands require more time to complete.
-  __show_spinner "$cmdsPID" "$CMDS" "$MSG"
+  # Animate only on a terminal that can save the cursor position (not
+  # TERM=dumb or unset). Logs and pipes get just the result line.
+  if [ -t 1 ] && [ -n "$(__tput sc)" ]; then
+    __show_spinner "$cmdsPID" "$MSG"
+  fi
 
   # Wait for the commands to no longer be executing
   # in the background, and then get their exit code.
   wait "$cmdsPID" &>/dev/null || exitCode=$?
 
-  # Print output based on what happened.
-  __print_result $exitCode "$MSG" || true
+  __print_result "$exitCode" "$MSG"
 
-  if [ $exitCode -ne 0 ]; then
-    __print_error_stream <"$TMP_FILE"
+  if [ "$exitCode" -ne 0 ]; then
+    __print_error_stream <"$__EXECUTE_OUTPUT"
   fi
 
-  rm -rf "$TMP_FILE"
+  rm -f "$__EXECUTE_OUTPUT"
+  __EXECUTE_OUTPUT=""
 
-  return $exitCode
+  return "$exitCode"
 }
 
-([ "$0" = "${BASH_SOURCE[0]}" ] && display_version 0.16.0) || true
+if [ "$0" = "${BASH_SOURCE[0]}" ]; then display_version "$UTILS_VERSION"; fi
