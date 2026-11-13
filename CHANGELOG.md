@@ -4,6 +4,13 @@ All notable changes to this project are listed here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Added
+
+- Sourcing any of the scripts on bash older than 4.4 stops with a clear error.
+  Before, they failed later with errors like "unbound variable".
+
 ## 0.17.0 - 2026-11-13
 
 ### Changed

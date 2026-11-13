@@ -5,6 +5,14 @@ set -Eeuo pipefail
 # Every module sources this file, so skip the work when it already ran
 if declare -F display_version >/dev/null; then return 0; fi
 
+# Older bash lacks features these scripts use, and under `set -u` it fails on
+# empty arrays. Stop with a clear error instead of a confusing one later.
+if ((BASH_VERSINFO[0] * 100 + BASH_VERSINFO[1] < 404)); then
+  echo "utils.sh needs bash 4.4 or newer, but this is bash ${BASH_VERSION}" >&2
+  if [ "$0" = "${BASH_SOURCE[0]}" ]; then exit 1; fi
+  return 1
+fi
+
 # shellcheck source=./colors.sh
 . "$(dirname "${BASH_SOURCE[0]}")/colors.sh"
 
