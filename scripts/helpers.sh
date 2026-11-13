@@ -2,24 +2,23 @@
 
 set -Eeuo pipefail
 
-import() {
-  local -r SCRIPTS_DIR=$(dirname "${BASH_SOURCE[0]:-$0}")
-
-  # shellcheck source=/dev/null
-  . "${SCRIPTS_DIR}/${1}"
-}
+# Every module sources this file, so skip the work when it already ran
+if declare -F display_version >/dev/null; then return 0; fi
 
 # shellcheck source=./colors.sh
-import colors.sh
+. "$(dirname "${BASH_SOURCE[0]}")/colors.sh"
+
+# The version every script prints when it runs directly
+UTILS_VERSION=0.16.0
 
 function display_version() {
-  local program="${2:-$(basename "$0")}"
-  local version=${1:?"You need to give a version number"}
+  local -r version=${1:?"You need to give a version number"}
+  local -r program=${2:-$(basename "$0")}
 
-  if [ -x "$(command -v figlet)" ]; then
-    echo -n "${BLUE}${BOLD}"
+  if command -v figlet &>/dev/null; then
+    printf '%s' "${BLUE}${BOLD}"
     figlet "${program} script"
-    echo -n "${RESET}"
+    printf '%s' "${RESET}"
     echo "version ${version}"
   else
     echo "${program} script version ${version}"
@@ -27,8 +26,9 @@ function display_version() {
 }
 
 function help_title_section() {
-  local -r TITLE=$(echo "$@" | tr '[:lower:]' '[:upper:]')
-  echo -e "${BOLD}${TITLE}${RESET}"
+  # "$*" joins with the first character of IFS, which callers may change
+  local IFS=' '
+  printf '%s\n' "${BOLD}${*^^}${RESET}"
 }
 
-([ "$0" = "${BASH_SOURCE[0]}" ] && display_version 0.16.0) || true
+if [ "$0" = "${BASH_SOURCE[0]}" ]; then display_version "$UTILS_VERSION"; fi

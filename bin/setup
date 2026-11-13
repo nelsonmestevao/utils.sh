@@ -1,42 +1,19 @@
 #!/usr/bin/env bash
+#
+# Install the tools to test, lint and format this project.
 
 set -Eeuo pipefail
 
-ARCH_PACKAGES=(
-  bash-bats
-  bash-bats-assert
-  bash-bats-support
-  shfmt
-  make
-)
-
-FEDORA_PACKAGES=(
-  bats
-  shfmt
-  make
-)
-
-UBUNTU_DEBIAN_PACKAGES=(
-  bats
-  shfmt
-  make
-)
-
 if [[ -f /etc/arch-release ]]; then
-  for pkg in ${ARCH_PACKAGES[@]}; do
-    yay -Syu $pkg
-  done
+  yay -S --needed bash-bats kcov make shellcheck shfmt
 elif [[ -f /etc/fedora-release ]]; then
-  for pkg in ${FEDORA_PACKAGES[@]}; do
-    sudo dnf install -y $pkg
-  done
-elif [[ -f /etc/lsb-release ]] && grep -q "DISTRIB_ID=Ubuntu" /etc/lsb-release || [[ -f /etc/debian_version ]]; then
-  for pkg in ${UBUNTU_DEBIAN_PACKAGES[@]}; do
-    sudo apt-get install -y $pkg
-  done
-elif [[ -f /etc/os-release ]] && grep -q "NAME=NixOS" /etc/os-release; then
-  nix develop --command $SHELL
+  sudo dnf install -y bats kcov make ShellCheck shfmt
+elif [[ -f /etc/debian_version ]]; then # Debian and Ubuntu
+  sudo apt-get update
+  sudo apt-get install -y --no-install-recommends bats kcov make shellcheck shfmt
+elif grep -qs "NAME=NixOS" /etc/os-release; then
+  nix develop --command "$SHELL"
 else
-  echo "Error: This script does not support your operating system."
+  echo "Error: This script does not support your operating system." >&2
   exit 1
 fi

@@ -1,5 +1,6 @@
 #!/usr/bin/env bats
 
+load test_helper
 load ../scripts/helpers.sh
 
 @test "display_version without figlet" {
@@ -36,4 +37,32 @@ load ../scripts/helpers.sh
 
   [ "$status" -eq 0 ]
   [ "$output" = "${BOLD}USAGE INFO${RESET}" ]
+}
+
+@test "help_title_section joins words with spaces under a strict IFS" {
+  title_with_strict_ifs() {
+    local IFS=$'\n\t'
+    help_title_section usage info
+  }
+
+  run title_with_strict_ifs
+
+  [ "$output" = "${BOLD}USAGE INFO${RESET}" ]
+}
+
+@test "running a script directly prints its version" {
+  local script
+  for script in execs formatting git helpers logging utils; do
+    run_clean bash "scripts/${script}.sh"
+
+    [ "$status" -eq 0 ]
+    [[ "${lines[-1]}" =~ version\ [0-9]+\.[0-9]+\.[0-9]+$ ]]
+  done
+}
+
+@test "sourcing a script prints nothing" {
+  run_clean bash -c '. scripts/utils.sh; . scripts/execs.sh; . scripts/formatting.sh; . scripts/git.sh'
+
+  [ "$status" -eq 0 ]
+  [ -z "$output" ]
 }

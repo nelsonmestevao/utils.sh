@@ -2,52 +2,44 @@
 
 set -Eeuo pipefail
 
-import() {
-  local -r SCRIPTS_DIR=$(dirname "${BASH_SOURCE[0]}")
-
-  # shellcheck source=/dev/null
-  . "${SCRIPTS_DIR}/${1}"
-}
-
-# shellcheck source=./colors.sh
-import colors.sh
 # shellcheck source=./logging.sh
-import logging.sh
-# shellcheck source=./helpers.sh
-import helpers.sh
+. "$(dirname "${BASH_SOURCE[0]}")/logging.sh"
 
 function is_installed() {
   [ -x "$(command -v "$@")" ]
 }
 
 function not_installed() {
-  [ ! -x "$(command -v "$@")" ]
+  ! is_installed "$@"
 }
 
 function load_env_file() {
-  local debug=0
-  local file=".env"
+  # Odd names, so the file's variables (e.g. `file=...`) don't land in these
+  # locals instead of being exported
+  local __env_debug=0
+  local __env_file=".env"
+  local __env_lines=()
 
   while (($#)); do
     case "$1" in
-      -d | -dbg | --dbg | --debug) debug=1 ;;
-      *) file="$1" ;;
+      -d | -dbg | --dbg | --debug) __env_debug=1 ;;
+      *) __env_file="$1" ;;
     esac
     shift
   done
 
-  if [ -f "$file" ]; then
-    log_info --label "Environment" "Loading ${CYAN}${file}${RESET}..."
+  if [ -f "$__env_file" ]; then
+    log_info --label "Environment" "Loading ${CYAN}${__env_file}${RESET}..."
     set -o allexport
     # shellcheck source=/dev/null
-    source "$file"
+    source "$__env_file"
     set +o allexport
-    if ((debug)); then
-      mapfile -t lines <"${file}"
-      log_debug "${lines[@]}"
+    if ((__env_debug)); then
+      mapfile -t __env_lines <"$__env_file"
+      log_debug "${__env_lines[@]}"
     fi
   else
-    log_warn "${file} file not found, skipping..."
+    log_warn "${__env_file} file not found, skipping..."
   fi
 }
 
@@ -67,20 +59,20 @@ function ask_for_sudo() {
 }
 
 function ensure_confirmation() {
-  local confirmation
+  local confirmation=""
 
-  # Using echo to output the message and -n flag to allow following input in the same line
   echo -n "Are you sure you want to proceed? [Y/n] "
-  read -r confirmation
 
-  # Transform to lowercase to allow 'Y' or 'y' as a confirmation
-  confirmation=${confirmation,,}
-  confirmation=${confirmation:-"y"}
+  # An empty answer accepts the default, but no input at all (EOF) cancels.
+  read -r confirmation || [ -n "$confirmation" ] || confirmation="n"
 
-  if [ "$confirmation" != "y" ]; then
-    exit_message "Operation cancelled. Exiting..."
-    exit 1
-  fi
+  case "${confirmation,,}" in
+    "" | y | yes) ;;
+    *)
+      exit_message "Operation cancelled. Exiting..."
+      exit 1
+      ;;
+  esac
 }
 
 function get_os_name() {
@@ -94,12 +86,13 @@ function sanitize_name() {
   echo "${name//[^a-zA-Z0-9]/-}"
 }
 
+# `-u` instead of `--utc`, so it also works with BSD/macOS date.
 function datetime() {
-  date --utc '+%FT%TZ'
+  date -u '+%FT%TZ'
 }
 
 function timestamp() {
-  date --utc '+%Y%m%d%H%M%S'
+  date -u '+%Y%m%d%H%M%S'
 }
 
-([ "$0" = "${BASH_SOURCE[0]}" ] && display_version 0.16.0) || true
+if [ "$0" = "${BASH_SOURCE[0]}" ]; then display_version "$UTILS_VERSION"; fi

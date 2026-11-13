@@ -1,70 +1,67 @@
 #!/usr/bin/env bats
 
+# Only utils.sh, which must bring the logging functions with it
+load ../../scripts/utils.sh
+
 setup() {
-  # Create a temporary test.env file with the expected contents
-  cat <<EOF >test.env
+  cd "$BATS_TEST_TMPDIR"
+  cat <<'ENV' >test.env
 var1=expected_value1
 var2=expected_value2
 var3=expected_value3
 var4="Hello World"
-EOF
-}
-
-teardown() {
-  # Remove the temporary test.env file
-  rm test.env
+ENV
 }
 
 @test "load_env_file with filename" {
-  . scripts/colors.sh
-  . scripts/logging.sh
-  . scripts/utils.sh
-
   run load_env_file test.env
-  echo $output
+
   [ "$status" -eq 0 ]
-
-  # Verify that variables are exported
-  load_env_file test.env
-  [ "${var1}" = "expected_value1" ]
-  [ "${var2}" = "expected_value2" ]
-  [ "${var3}" = "expected_value3" ]
-  [ "${var4}" = "Hello World" ]
-
-  # Check the second line of output with a regex
   [[ "${lines[1]}" =~ Loading\ .*test.env.*\.\.\. ]]
 }
 
-@test "load_env_file with debug flag" {
-  . scripts/colors.sh
-  . scripts/logging.sh
-  . scripts/utils.sh
+@test "load_env_file exports the variables" {
+  load_env_file test.env >/dev/null
 
-  run load_env_file --debug test.env
-  [ "$status" -eq 0 ]
-
-  # Verify that variables are exported
-  load_env_file test.env
   [ "${var1}" = "expected_value1" ]
   [ "${var2}" = "expected_value2" ]
   [ "${var3}" = "expected_value3" ]
   [ "${var4}" = "Hello World" ]
+  [[ "$(declare -p var1)" =~ "declare -x" ]]
+}
 
-  # Check the debug output is shown
+@test "load_env_file uses .env by default" {
+  echo "from_default=yes" >.env
+
+  load_env_file >/dev/null
+
+  [ "${from_default}" = "yes" ]
+}
+
+@test "load_env_file with debug flag" {
+  run load_env_file --debug test.env
+
+  [ "$status" -eq 0 ]
   [[ "${lines[4]}" =~ "var1=expected_value1" ]]
   [[ "${lines[5]}" =~ "var2=expected_value2" ]]
   [[ "${lines[6]}" =~ "var3=expected_value3" ]]
   [[ "${lines[7]}" =~ "var4=\"Hello World\"" ]]
 }
 
+@test "load_env_file exports variables named file, debug and lines" {
+  printf 'file=from_env\ndebug=from_env\nlines=from_env\n' >names.env
+
+  load_env_file --debug names.env >/dev/null
+
+  [ "${file}" = "from_env" ]
+  [ "${debug}" = "from_env" ]
+  [ "${lines}" = "from_env" ]
+  [[ "$(declare -p file)" =~ "declare -x" ]]
+}
+
 @test "load_env_file with non existing env file" {
-  . scripts/colors.sh
-  . scripts/logging.sh
-  . scripts/utils.sh
-
   run load_env_file --debug non_existing.env
-  [ "$status" -eq 0 ]
 
-  # Check the debug output is shown
+  [ "$status" -eq 0 ]
   [[ "${lines[1]}" =~ non_existing.env\ file\ not\ found,\ skipping\.\.\. ]]
 }

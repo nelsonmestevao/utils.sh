@@ -2,15 +2,8 @@
 
 set -Eeuo pipefail
 
-import() {
-  local -r SCRIPTS_DIR=$(dirname "${BASH_SOURCE[0]:-$0}")
-
-  # shellcheck source=/dev/null
-  . "${SCRIPTS_DIR}/${1}"
-}
-
 # shellcheck source=./helpers.sh
-import helpers.sh
+. "$(dirname "${BASH_SOURCE[0]}")/helpers.sh"
 
 function get_default_repo_branch() {
   # Check if main exists and use instead of master
@@ -25,4 +18,4 @@ function get_default_repo_branch() {
   echo master
 }
 
-([ "$0" = "${BASH_SOURCE[0]}" ] && display_version 0.16.0) || true
+if [ "$0" = "${BASH_SOURCE[0]}" ]; then display_version "$UTILS_VERSION"; fi
