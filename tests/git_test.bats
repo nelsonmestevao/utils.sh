@@ -3,6 +3,11 @@
 load ../scripts/git.sh
 
 @test "get_default_repo_branch returns main if it exists" {
+  # A repo of its own: CI checks out pull requests without a main branch
+  cd "$BATS_TEST_TMPDIR"
+  git init -q -b main
+  git -c user.name=test -c user.email=test@example.com commit -q --allow-empty -m init
+
   run get_default_repo_branch
 
   [ "$status" -eq 0 ]
