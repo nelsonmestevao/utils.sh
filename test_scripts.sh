@@ -27,8 +27,12 @@ log_success "Everything is good"
 log_info "Cenas maradas"
 log_info --label "example" "cenas coisas"
 
-load_env_file ".env"
-load_env_file -dbg ".env"
+ENV_FILE=$(mktemp)
+trap 'rm -f "$ENV_FILE"' EXIT
+printf '%s\n' 'hello=world' 'answer=42' >"$ENV_FILE"
+
+load_env_file "$ENV_FILE"
+load_env_file -dbg "$ENV_FILE"
 load_env_file "non-existing.env"
 
 ensure_confirmation
