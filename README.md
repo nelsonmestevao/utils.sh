@@ -130,7 +130,7 @@ use `nix develop` or [direnv](https://direnv.net/).
 | `./test_scripts.sh` | Shows what the scripts print, to check by eye. |
 
 To release, bump the version with
-`./increment_scripts_versions.sh [major|minor|patch]`, add a section for it to
+`bin/bump-version [major|minor|patch]`, add a section for it to
 [`CHANGELOG.md`](CHANGELOG.md), commit, and tag the commit `vX.Y.Z`.
 
 ## License

@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 #
 # Bump the version that every script prints when it runs directly.
-# Usage: ./increment_scripts_versions.sh [major|minor|patch]
+# Usage: bin/bump-version [major|minor|patch]
 
 set -Eeuo pipefail
 
-cd "$(dirname "${BASH_SOURCE[0]}")"
+cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 current=$(sed -n 's/^UTILS_VERSION=//p' scripts/helpers.sh)
 IFS=. read -r major minor patch <<<"$current"
