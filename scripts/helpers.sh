@@ -17,7 +17,7 @@ fi
 . "$(dirname "${BASH_SOURCE[0]}")/colors.sh"
 
 # The version every script prints when it runs directly
-UTILS_VERSION=0.17.0
+UTILS_VERSION=0.18.0
 
 function display_version() {
   local -r version=${1:?"You need to give a version number"}

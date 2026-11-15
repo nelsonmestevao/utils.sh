@@ -4,7 +4,7 @@ All notable changes to this project are listed here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 0.18.0 - 2026-11-15
 
 ### Added
 
@@ -15,6 +15,17 @@ All notable changes to this project are listed here. The format follows
 
 - `log_info` prints messages that start with `-`, like `-v is set`. Before, it
   stopped the script with "Unsupported flag".
+- Sourcing `logging.sh` no longer sets `LOG_LEVEL`. When it is unset or empty,
+  the `log_*` functions still show every level, as with `DEBUG`.
+
+### Development
+
+- `increment_scripts_versions.sh` is now `bin/bump-version`. `make lint` checks
+  every file in `bin/`.
+- Pushing a `vX.Y.Z` tag makes a GitHub release with the notes from this file.
+  It fails if the tag does not match `UTILS_VERSION`.
+- Added a README.
+- Removed the unused GitLab CI script and the sample `.env`.
 
 ## 0.17.0 - 2026-11-13
 
