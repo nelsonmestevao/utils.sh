@@ -138,6 +138,18 @@ load ../scripts/logging.sh
   done
 }
 
+@test "an unset or empty LOG_LEVEL shows every level" {
+  unset LOG_LEVEL
+  run log_debug "shown"
+  [ "$status" -eq 0 ]
+  [ "${lines[1]}" = "• shown" ]
+
+  LOG_LEVEL=""
+  run log_debug "shown"
+  [ "$status" -eq 0 ]
+  [ "${lines[1]}" = "• shown" ]
+}
+
 @test "an unknown LOG_LEVEL falls back to INFO" {
   for LOG_LEVEL in bogus WARN; do
     run log_debug "hidden"

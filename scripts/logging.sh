@@ -8,15 +8,13 @@ set -Eeuo pipefail
 # Global (-g), so it still exists when this file is sourced inside a function.
 declare -gA LOG_LEVELS=([DEBUG]=0 [INFO]=1 [WARNING]=3 [ERROR]=4)
 
-# Set default log level
-LOG_LEVEL=${LOG_LEVEL:-"DEBUG"}
-
 function exit_message() {
   printf '\n %s %s %s\n\n' "${RED}>>>${RESET}" "${BOLD}${YELLOW}$1${RESET}" "${RED}⨯${RESET}" >&2
 }
 
 function __log() {
   local -r LEVEL="$1" LABEL="$2" COLOR="$3"
+  # Read on each call, so a change after sourcing counts. Unset means DEBUG.
   local -r MIN_LEVEL=${LOG_LEVEL:-DEBUG}
   shift 3
 
