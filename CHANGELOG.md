@@ -11,6 +11,11 @@ All notable changes to this project are listed here. The format follows
 - Sourcing any of the scripts on bash older than 4.4 stops with a clear error.
   Before, they failed later with errors like "unbound variable".
 
+### Changed
+
+- `log_info` prints messages that start with `-`, like `-v is set`. Before, it
+  stopped the script with "Unsupported flag".
+
 ## 0.17.0 - 2026-11-13
 
 ### Changed

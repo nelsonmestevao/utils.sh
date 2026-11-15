@@ -36,5 +36,3 @@ load_env_file -dbg "$ENV_FILE"
 load_env_file "non-existing.env"
 
 ensure_confirmation
-
-log_info --non-reall-flag "Hello"

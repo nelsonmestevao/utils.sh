@@ -70,11 +70,7 @@ function log_info() {
         MSGS+=("$@")
         break
         ;;
-      -*) # unsupported flags
-        exit_message "Unsupported flag '$1' in 'log_info()' function"
-        exit 1
-        ;;
-      *) # preserve positional arguments
+      *) # preserve positional arguments, even ones that start with -
         MSGS+=("$1")
         shift
         ;;
