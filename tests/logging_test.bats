@@ -71,11 +71,12 @@ load ../scripts/logging.sh
   [ "${lines[1]}" = "• --not-a-flag" ]
 }
 
-@test "log_info with an unsupported flag fails" {
-  run log_info --bogus "message"
+@test "log_info prints messages that start with a dash" {
+  run log_info "-v is set" "--bogus"
 
-  [ "$status" -eq 1 ]
-  [[ "$output" =~ "Unsupported flag '--bogus'" ]]
+  [ "$status" -eq 0 ]
+  [ "${lines[1]}" = "• -v is set" ]
+  [ "${lines[2]}" = "• --bogus" ]
 }
 
 @test "log lines fit the terminal, up to 80 columns" {
