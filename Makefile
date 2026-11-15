@@ -20,7 +20,7 @@ fmt format:
 
 .PHONY: lint # Lint the source code
 lint:
-	@shellcheck -xa scripts/*.sh *.sh bin/setup
+	@shellcheck -xa scripts/*.sh *.sh bin/*
 
 .PHONY: test # Run the test suite
 test:
